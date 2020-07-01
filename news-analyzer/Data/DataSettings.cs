@@ -1,4 +1,4 @@
-namespace Data.DataService
+namespace Data
 {
     public class DataSettings : IDataSettings
     {
