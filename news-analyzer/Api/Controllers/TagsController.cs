@@ -1,19 +1,24 @@
 using System.Collections.Generic;
+using System.Net.Mime;
 using Api.Models;
 using Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Api.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    [Produces(MediaTypeNames.Application.Json)]
     public class TagsController : ControllerBase
     {
         private readonly TagService _tagService;
+        private readonly ILogger<TagsController> _logger;
 
-        public TagsController(TagService tagService)
+        public TagsController(TagService tagService, ILogger<TagsController> logger)
         {
             _tagService = tagService;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -34,6 +39,7 @@ namespace Api.Controllers
         }
         
         [HttpPost("search")]
+        [Consumes("application/json")]
         public ActionResult<List<Tag>> Search([FromBody] string name)
         {
             var tags = _tagService.Search(name);
@@ -47,14 +53,19 @@ namespace Api.Controllers
         }
 
         [HttpPost]
+        [Consumes("application/json")]
         public ActionResult<Tag> Create(Tag tag)
         {
+            if (_tagService.NameExists(tag.Name))
+                return Conflict();
+            
             _tagService.Create(tag);
 
             return CreatedAtRoute("GetTag", new { id = tag.Id }, tag);
         }
 
         [HttpPut("{id:length(24)}")]
+        [Consumes("application/json")]
         public IActionResult Update(string id, Tag tagIn)
         {
             var tag = _tagService.Get(id);

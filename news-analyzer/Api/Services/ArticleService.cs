@@ -32,12 +32,17 @@ namespace Api.Services
 
         public Article Create(Article article)
         {
+            if (_articles.Find(a => a.Title == article.Title).FirstOrDefault() != null)
+                return null;
             _articles.InsertOne(article);
             return article;
         }
 
         public Article Create(RawArticle data)
         {
+            if (_articles.Find(a => a.Title == data.Title).FirstOrDefault() != null)
+                return null;
+            
             var ( title, description, content, authorName, photo, category, 
                 site, tagNames, timePublished, url ) = data;
             
@@ -48,7 +53,7 @@ namespace Api.Services
             var author = _authorService.Create(authorName, site, article.Id);
 
             article.Tags = tags;
-            article.AuthorId = author.Id;
+            article.AuthorId = author?.Id;
             
             Update(article.Id, article);
 
@@ -66,15 +71,20 @@ namespace Api.Services
 
         public void Remove(string id)
         {
-            var article = _articles.Find(article => article.Id == id).FirstOrDefault();
+            var article = _articles.Find(a => a.Id == id).FirstOrDefault();
             SafeRemove(article);
-            _articles.DeleteOne(article => article.Id == id);
+            _articles.DeleteOne(a => a.Id == id);
         }
 
         public void SafeRemove(Article article)
         {
             _tagService.Remove(article.Tags);
             _authorService.Remove(article.AuthorId);
+        }
+
+        public bool TitleExists(string title)
+        {
+            return _articles.Find(a => a.Title == title).FirstOrDefault() != null;
         }
     }
 }

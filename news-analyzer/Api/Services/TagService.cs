@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Api.Models;
 using MongoDB.Driver;
@@ -36,6 +37,10 @@ namespace Api.Services
             var tags = new List<string>();
             foreach (var tagName in tagNames)
             {
+                if (string.IsNullOrEmpty(tagName))
+                {
+                    continue;
+                }
                 var tag = _tags.Find(Builders<Tag>.Filter.Text(tagName)).FirstOrDefault();
                 if (tag == null)
                 {
@@ -76,6 +81,11 @@ namespace Api.Services
                     Remove(tagId);
                 }
             }
+        }
+        
+        public bool NameExists(string name)
+        {
+            return _tags.Find(t => t.Name == name).FirstOrDefault() != null;
         }
     }
 }

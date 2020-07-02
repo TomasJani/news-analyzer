@@ -33,6 +33,10 @@ namespace Api.Services
 
         public Author Create(string authorName, Site site, string articleId)
         {
+            if (string.IsNullOrEmpty(authorName))
+            {
+                return null;
+            }
             var author = _authors.Find(Builders<Author>.Filter.Text(authorName)).FirstOrDefault();
             if (author == null)
             {
@@ -63,6 +67,11 @@ namespace Api.Services
             {
                 _authors.DeleteOne(author => author.Id == id);
             }
+        }
+        
+        public bool NameExists(string name)
+        {
+            return _authors.Find(a => a.Name == name).FirstOrDefault() != null;
         }
     }
 }

@@ -1,20 +1,25 @@
 using System.Collections.Generic;
+using System.Net.Mime;
 using Api.Models;
 using Api.Services;
 using Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Api.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    [Produces(MediaTypeNames.Application.Json)]
     public class ArticlesController : ControllerBase
     {
         private readonly ArticleService _articleService;
+        private readonly ILogger<ArticlesController> _logger;
 
-        public ArticlesController(ArticleService articleService)
+        public ArticlesController(ArticleService articleService, ILogger<ArticlesController> logger)
         {
             _articleService = articleService;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -35,6 +40,7 @@ namespace Api.Controllers
         }
 
         [HttpPost("search")]
+        [Consumes("application/json")]
         public ActionResult<List<Article>> Search([FromBody] string text)
         {
             var articles = _articleService.Search(text);
@@ -48,22 +54,31 @@ namespace Api.Controllers
         }
 
         [HttpPost]
+        [Consumes("application/json")]
         public ActionResult<Article> Create(Article article)
         {
+            if (_articleService.TitleExists(article.Title))
+                return Conflict();
+            
             _articleService.Create(article);
 
             return CreatedAtRoute("GetArticle", new {id = article.Id}, article);
         }
         
         [HttpPost("raw")]
+        [Consumes("application/json")]
         public ActionResult<Article> Create(RawArticle article)
         {
+            if (_articleService.TitleExists(article.Title))
+                return Conflict();
+            
             var newArticle = _articleService.Create(article);
 
             return CreatedAtRoute("GetArticle", new {id = newArticle.Id}, newArticle);
         }
 
         [HttpPut("{id:length(24)}")]
+        [Consumes("application/json")]
         public IActionResult Update(string id, Article articleIn)
         {
             var article = _articleService.Get(id);

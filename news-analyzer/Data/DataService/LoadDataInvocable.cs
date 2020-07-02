@@ -23,20 +23,24 @@ namespace Data.DataService
             _logger = logger;
         }
 
-        public Task Invoke()
+        public async Task Invoke()
         {
-            Load();
-            return Task.CompletedTask;
+            await Load();
         }
 
-        public async void Load()
+        public async Task Load()
         {
-            var rawArticles = GetArticles() ?? new List<RawArticle>();
+            var dateTime = DateTime.Now.ToString("yyyy-MM-dd");
+            await Load(dateTime);
+        }
+
+        public async Task Load(string dateTime)
+        {
+            var rawArticles = await GetArticles(dateTime) ?? new List<RawArticle>();
             using var client = new HttpClient();
             foreach (var rawArticle in rawArticles)
             {
                 var articleJson = rawArticle.ToString();
-                // add try catch
                 var response = await client.PostAsync(
                     $"{_settings.ApiUrl}{_settings.ArticlesEndpoint}", 
                     new StringContent(articleJson, Encoding.UTF8, "application/json"));
@@ -46,16 +50,25 @@ namespace Data.DataService
                 }
             }
         }
-
-        private IEnumerable<RawArticle> GetArticles()
+        
+        public async Task InitialLoad(uint loadDays)
         {
-            var dateTime = DateTime.Now.ToString("yyyy-MM-dd");
+            var dayToLoad = DateTime.Now;
+            for (var i = 0; i < loadDays; ++i)
+            {
+                dayToLoad = dayToLoad.AddDays(-1);
+                await Load(dayToLoad.ToString("yyyy-MM-dd"));
+            }
+        }
+
+        private async Task<IEnumerable<RawArticle>> GetArticles(string dateTime)
+        {
             var fileName = Path.Combine(_currentDirectory, _settings.DataFolder, $"{dateTime}.json");
 
             try
             {
                 using var jsonFileReader = File.OpenText(fileName);
-                return JsonConvert.DeserializeObject<RawArticle[]>(jsonFileReader.ReadToEnd());
+                return JsonConvert.DeserializeObject<RawArticle[]>(await jsonFileReader.ReadToEndAsync());
             }
             catch (Exception e) 
             {

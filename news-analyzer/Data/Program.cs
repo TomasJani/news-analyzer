@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Coravel;
 using Data.DataService;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,21 +9,22 @@ namespace Data
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var host = CreateHostBuilder(args).Build();
+            var settings = host.Services.GetService<IDataSettings>();
+            var service = host.Services.GetService<LoadDataInvocable>();
+            
+            if (settings.InitialDaysLoad != 0)
+                await service.InitialLoad(settings.InitialDaysLoad);
+            
             host.Services.UseScheduler(scheduler =>
             {
-                var loadDataHour = host.Services.GetService<IDataSettings>().LoadDataHour;
-                // Testing loading
-                var service = host.Services.GetService<LoadDataInvocable>();
-                service.Load();
-                
                 scheduler
                     .Schedule<LoadDataInvocable>()
-                    .DailyAtHour(loadDataHour);
+                    .DailyAtHour(settings.LoadDataHour);
             });
-            host.Run();
+            await host.RunAsync();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

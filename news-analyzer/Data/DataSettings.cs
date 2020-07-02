@@ -6,6 +6,7 @@ namespace Data
         public string ArticlesEndpoint { get; set; }
         public string DataFolder { get; set; }
         public int LoadDataHour { get; set; }
+        public uint InitialDaysLoad { get; set; }
     }
 
     public interface IDataSettings
@@ -14,5 +15,6 @@ namespace Data
         public string ArticlesEndpoint { get; set; }
         public string DataFolder { get; set; }
         public int LoadDataHour { get; set; }
+        public uint InitialDaysLoad { get; set; }
     }
 }
