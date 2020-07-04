@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Api.Models;
 using Data;
 using MongoDB.Driver;
@@ -17,74 +18,86 @@ namespace Api.Services
             _authorService = authorService;
             
             var database = client.GetDatabase(settings.DatabaseName);
-
             _articles = database.GetCollection<Article>(settings.ArticleCollectionName);
         }
 
-        public List<Article> Get() =>
-            _articles.Find(article => true).ToList();
-
-        public Article Get(string id) =>
-            _articles.Find(article => article.Id == id).FirstOrDefault();
-
-        public List<Article> Search(string text) =>
-            _articles.Find(Builders<Article>.Filter.Text(text)).ToList();
-
-        public Article Create(Article article)
+        public async Task<List<Article>> Get()
         {
-            if (_articles.Find(a => a.Title == article.Title).FirstOrDefault() != null)
+            var foundArticle = await _articles.FindAsync(article => true);
+            return await foundArticle.ToListAsync();
+        }
+
+        public async Task<Article> Get(string id)
+        {
+            var foundArticle = await _articles.FindAsync(article => article.Id == id);
+            return await foundArticle.FirstOrDefaultAsync();
+        }
+
+        public async Task<List<Article>> Search(string text)
+        {
+            var foundArticle = await _articles.FindAsync(Builders<Article>.Filter.Text(text));
+            return await foundArticle.ToListAsync();
+        }
+
+        public async Task<Article> Create(Article article)
+        {
+            var foundArticle = await _articles.FindAsync(a => a.Title == article.Title);
+            if (await foundArticle.FirstOrDefaultAsync() != null)
                 return null;
-            _articles.InsertOne(article);
+            await _articles.InsertOneAsync(article);
             return article;
         }
 
-        public Article Create(RawArticle data)
+        public async Task<Article> Create(RawArticle data)
         {
-            if (_articles.Find(a => a.Title == data.Title).FirstOrDefault() != null)
+            var foundArticle = await _articles.FindAsync(a => a.Title == data.Title);
+            if (await foundArticle.FirstOrDefaultAsync() != null)
                 return null;
             
             var ( title, description, content, authorName, photo, category, 
                 site, tagNames, timePublished, url ) = data;
             
             var article = new Article(title, description, content, url, photo, category, timePublished);
-            _articles.InsertOne(article);
+            await _articles.InsertOneAsync(article);
             
-            var tags = _tagService.Create(tagNames, article.Id);
-            var author = _authorService.Create(authorName, site, article.Id);
+            var tags = await _tagService.Create(tagNames, article.Id);
+            var author = await _authorService.Create(authorName, site, article.Id);
 
             article.Tags = tags;
             article.AuthorId = author?.Id;
             
-            Update(article.Id, article);
+            await Update(article.Id, article);
 
             return article;
         }
 
-        public void Update(string id, Article articleIn) =>
-            _articles.ReplaceOne(article => article.Id == id, articleIn);
+        public async Task Update(string id, Article articleIn) =>
+            await _articles.ReplaceOneAsync(article => article.Id == id, articleIn);
 
-        public void Remove(Article articleIn)
+        public async Task Remove(Article articleIn)
         {
-            SafeRemove(articleIn);
-            _articles.DeleteOne(article => article.Id == articleIn.Id);
+            await SafeRemove(articleIn);
+            await _articles.DeleteOneAsync(article => article.Id == articleIn.Id);
         }
 
-        public void Remove(string id)
+        public async Task Remove(string id)
         {
-            var article = _articles.Find(a => a.Id == id).FirstOrDefault();
-            SafeRemove(article);
-            _articles.DeleteOne(a => a.Id == id);
+            var foundArticle = await _articles.FindAsync(a => a.Id == id);
+            var article = await foundArticle.FirstOrDefaultAsync();
+            await SafeRemove(article);
+            await _articles.DeleteOneAsync(a => a.Id == id);
         }
 
-        public void SafeRemove(Article article)
+        public async Task SafeRemove(Article article)
         {
-            _tagService.Remove(article.Tags);
-            _authorService.Remove(article.AuthorId);
+            await _tagService.Remove(article.Tags);
+            await _authorService.Remove(article.AuthorId);
         }
 
-        public bool TitleExists(string title)
+        public async Task<bool> TitleExists(string title)
         {
-            return _articles.Find(a => a.Title == title).FirstOrDefault() != null;
+            var foundArticle = await _articles.FindAsync(a => a.Title == title);
+            return await foundArticle.FirstOrDefaultAsync() != null;
         }
     }
 }

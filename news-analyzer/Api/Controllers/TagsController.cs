@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Net.Mime;
+using System.Threading.Tasks;
 using Api.Models;
 using Api.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -22,13 +23,13 @@ namespace Api.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<Tag>> Get() =>
-            _tagService.Get();
+        public async Task<ActionResult<List<Tag>>> Get() =>
+            await _tagService.Get();
         
         [HttpGet("{id:length(24)}", Name = "GetTag")]
-        public ActionResult<Tag> Get(string id)
+        public async Task<ActionResult<Tag>> Get(string id)
         {
-            var tag = _tagService.Get(id);
+            var tag = await _tagService.Get(id);
         
             if (tag == null)
             {
@@ -40,9 +41,9 @@ namespace Api.Controllers
         
         [HttpPost("search")]
         [Consumes("application/json")]
-        public ActionResult<List<Tag>> Search([FromBody] string name)
+        public async Task<ActionResult<List<Tag>>> Search([FromBody] string name)
         {
-            var tags = _tagService.Search(name);
+            var tags = await _tagService.Search(name);
 
             if (tags.Count == 0)
             {
@@ -54,43 +55,43 @@ namespace Api.Controllers
 
         [HttpPost]
         [Consumes("application/json")]
-        public ActionResult<Tag> Create(Tag tag)
+        public async Task<ActionResult<Tag>> Create(Tag tag)
         {
-            if (_tagService.NameExists(tag.Name))
+            if (await _tagService.NameExists(tag.Name))
                 return Conflict();
             
-            _tagService.Create(tag);
+            await _tagService.Create(tag);
 
             return CreatedAtRoute("GetTag", new { id = tag.Id }, tag);
         }
 
         [HttpPut("{id:length(24)}")]
         [Consumes("application/json")]
-        public IActionResult Update(string id, Tag tagIn)
+        public async Task<IActionResult> Update(string id, Tag tagIn)
         {
-            var tag = _tagService.Get(id);
+            var tag = await _tagService.Get(id);
 
             if (tag == null)
             {
                 return NotFound();
             }
 
-            _tagService.Update(id, tagIn);
+            await _tagService.Update(id, tagIn);
 
             return NoContent();
         }
 
         [HttpDelete("{id:length(24)}")]
-        public IActionResult Delete(string id)
+        public async Task<IActionResult> Delete(string id)
         {
-            var tag = _tagService.Get(id);
+            var tag = await _tagService.Get(id);
 
             if (tag == null)
             {
                 return NotFound();
             }
 
-            _tagService.Remove(tag.Id);
+            await _tagService.Remove(tag.Id);
 
             return NoContent();
         }

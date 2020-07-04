@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Api.Models;
 using Data.DataService.Enums;
 using MongoDB.Driver;
@@ -12,66 +13,79 @@ namespace Api.Services
         public AuthorService(IMongoClient client, INewsStoreDatabaseSettings settings)
         {
             var database = client.GetDatabase(settings.DatabaseName);
-
             _authors = database.GetCollection<Author>(settings.AuthorCollectionName);
         }
 
-        public List<Author> Get() =>
-            _authors.Find(author => true).ToList();
-
-        public Author Get(string id) =>
-            _authors.Find(author => author.Id == id).FirstOrDefault();
-
-        public List<Author> Search(string name) =>
-            _authors.Find(Builders<Author>.Filter.Text(name)).ToList();
-
-        public Author Create(Author author)
+        public async Task<List<Author>> Get()
         {
-            _authors.InsertOne(author);
+            var authors = await _authors.FindAsync(author => true);
+            return await authors.ToListAsync();
+        }
+
+        public async Task<Author> Get(string id)
+        {
+            var authors = await _authors.FindAsync(author => author.Id == id);
+            return await authors.FirstOrDefaultAsync();
+        }
+
+        public async Task<List<Author>> Search(string name)
+        {
+            var authors = await _authors.FindAsync(Builders<Author>.Filter.Text(name));
+            return await authors.ToListAsync();
+        }
+
+        public async Task<Author> Create(Author author)
+        {
+            await _authors.InsertOneAsync(author);
             return author;
         }
 
-        public Author Create(string authorName, Site site, string articleId)
+        public async Task<Author> Create(string authorName, Site site, string articleId)
         {
             if (string.IsNullOrEmpty(authorName))
             {
                 return null;
             }
-            var author = _authors.Find(Builders<Author>.Filter.Text(authorName)).FirstOrDefault();
+
+            var findAuthor = await _authors.FindAsync(Builders<Author>.Filter.Text(authorName));
+            var author = await findAuthor.FirstOrDefaultAsync();
             if (author == null)
             {
                 var newAuthor = new Author(authorName, site, articleId);
-                _authors.InsertOne(newAuthor);
+                await _authors.InsertOneAsync(newAuthor);
                 author = newAuthor;
             }
             else
             {
                 author.Count++;
                 author.Articles.Add(articleId);
-                Update(author.Id, author);
+                await Update(author.Id, author);
             }
 
             return author;
         }
 
-        public void Update(string id, Author authorIn) =>
-            _authors.ReplaceOne(author => author.Id == id, authorIn);
+        public async Task Update(string id, Author authorIn) =>
+            await _authors.ReplaceOneAsync(author => author.Id == id, authorIn);
 
-        public void Remove(Author authorIn) =>
-            _authors.DeleteOne(author => author.Id == authorIn.Id);
-        public void Remove(string id)
+        public async Task Remove(Author authorIn) =>
+            await _authors.DeleteOneAsync(author => author.Id == authorIn.Id);
+
+        public async Task Remove(string id)
         {
-            var author = _authors.Find(author => author.Id == id).FirstOrDefault();
+            var findAuthor = await _authors.FindAsync(a => a.Id == id);
+            var author =  await findAuthor.FirstOrDefaultAsync();
             author.Count--;
             if (author.Count <= 0)
             {
-                _authors.DeleteOne(author => author.Id == id);
+                await _authors.DeleteOneAsync(a => a.Id == id);
             }
         }
-        
-        public bool NameExists(string name)
+
+        public async Task<bool> NameExists(string name)
         {
-            return _authors.Find(a => a.Name == name).FirstOrDefault() != null;
+            var findAuthor = await _authors.FindAsync(a => a.Name == name);
+            return await findAuthor.FirstOrDefaultAsync() != null;
         }
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Net.Mime;
+using System.Threading.Tasks;
 using Api.Models;
 using Api.Services;
 using Data;
@@ -23,13 +24,13 @@ namespace Api.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<Article>> Get() =>
-            _articleService.Get();
+        public async Task<ActionResult<List<Article>>> Get() =>
+            await _articleService.Get();
 
         [HttpGet("{id:length(24)}", Name = "GetArticle")]
-        public ActionResult<Article> Get(string id)
+        public async Task<ActionResult<Article>> Get(string id)
         {
-            var article = _articleService.Get(id);
+            var article = await _articleService.Get(id);
 
             if (article == null)
             {
@@ -41,9 +42,9 @@ namespace Api.Controllers
 
         [HttpPost("search")]
         [Consumes("application/json")]
-        public ActionResult<List<Article>> Search([FromBody] string text)
+        public async Task<ActionResult<List<Article>>> Search([FromBody] string text)
         {
-            var articles = _articleService.Search(text);
+            var articles = await _articleService.Search(text);
 
             if (articles.Count == 0)
             {
@@ -55,55 +56,55 @@ namespace Api.Controllers
 
         [HttpPost]
         [Consumes("application/json")]
-        public ActionResult<Article> Create(Article article)
+        public async Task<ActionResult<Article>> Create(Article article)
         {
-            if (_articleService.TitleExists(article.Title))
+            if (await _articleService.TitleExists(article.Title))
                 return Conflict();
             
-            _articleService.Create(article);
+            await _articleService.Create(article);
 
             return CreatedAtRoute("GetArticle", new {id = article.Id}, article);
         }
         
         [HttpPost("raw")]
         [Consumes("application/json")]
-        public ActionResult<Article> Create(RawArticle article)
+        public async Task<ActionResult<Article>> Create(RawArticle article)
         {
-            if (_articleService.TitleExists(article.Title))
+            if (await _articleService.TitleExists(article.Title))
                 return Conflict();
             
-            var newArticle = _articleService.Create(article);
+            var newArticle = await _articleService.Create(article);
 
             return CreatedAtRoute("GetArticle", new {id = newArticle.Id}, newArticle);
         }
 
         [HttpPut("{id:length(24)}")]
         [Consumes("application/json")]
-        public IActionResult Update(string id, Article articleIn)
+        public async Task<IActionResult> Update(string id, Article articleIn)
         {
-            var article = _articleService.Get(id);
+            var article = await _articleService.Get(id);
 
             if (article == null)
             {
                 return NotFound();
             }
 
-            _articleService.Update(id, articleIn);
+            await _articleService.Update(id, articleIn);
 
             return NoContent();
         }
 
         [HttpDelete("{id:length(24)}")]
-        public IActionResult Delete(string id)
+        public async Task<IActionResult> Delete(string id)
         {
-            var article = _articleService.Get(id);
+            var article = await _articleService.Get(id);
 
             if (article == null)
             {
                 return NotFound();
             }
 
-            _articleService.Remove(article.Id);
+            await _articleService.Remove(article.Id);
 
             return NoContent();
         }

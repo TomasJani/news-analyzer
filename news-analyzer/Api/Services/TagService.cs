@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Api.Models;
 using MongoDB.Driver;
 using Tag = Api.Models.Tag;
@@ -17,22 +17,31 @@ namespace Api.Services
 
         }
 
-        public List<Tag> Get() =>
-            _tags.Find(tag => true).ToList();
-
-        public Tag Get(string id) =>
-            _tags.Find(tag => tag.Id == id).FirstOrDefault();
-
-        public List<Tag> Search(string name) =>
-            _tags.Find(Builders<Tag>.Filter.Text(name)).ToList();
-
-        public Tag Create(Tag tag)
+        public async Task<List<Tag>> Get()
         {
-            _tags.InsertOne(tag);
+            var foundTag = await _tags.FindAsync(tag => true);
+            return await foundTag.ToListAsync();
+        }
+
+        public async Task<Tag> Get(string id)
+        {
+            var foundTag = await _tags.FindAsync(tag => tag.Id == id);
+            return await foundTag.FirstOrDefaultAsync();
+        }
+
+        public async Task<List<Tag>> Search(string name)
+        {
+            var foundTag = await _tags.FindAsync(Builders<Tag>.Filter.Text(name));
+            return await foundTag.ToListAsync();
+        }
+
+        public async Task<Tag> Create(Tag tag)
+        {
+            await _tags.InsertOneAsync(tag);
             return tag;
         }
 
-        public ICollection<string> Create(IEnumerable<string> tagNames, string articleId)
+        public async Task<ICollection<string>> Create(IEnumerable<string> tagNames, string articleId)
         {
             var tags = new List<string>();
             foreach (var tagName in tagNames)
@@ -41,18 +50,20 @@ namespace Api.Services
                 {
                     continue;
                 }
-                var tag = _tags.Find(Builders<Tag>.Filter.Text(tagName)).FirstOrDefault();
+
+                var foundTag = await _tags.FindAsync(Builders<Tag>.Filter.Text(tagName));
+                var tag = await foundTag.FirstOrDefaultAsync();
                 if (tag == null)
                 {
                     var newTag = new Tag(tagName, articleId);
-                    _tags.InsertOne(newTag);
+                    await _tags.InsertOneAsync(newTag);
                     tag = newTag;
                 }
                 else
                 {
                     tag.Articles.Add(articleId);
                     tag.Count++;
-                    Update(tag.Id, tag);
+                    await Update(tag.Id, tag);
                 }
 
                 tags.Add(tag.Id);
@@ -61,31 +72,33 @@ namespace Api.Services
             return tags;
         }
 
-        public void Update(string id, Tag tagIn) =>
-            _tags.ReplaceOne(tag => tag.Id == id, tagIn);
+        public async Task Update(string id, Tag tagIn) =>
+            await _tags.ReplaceOneAsync(tag => tag.Id == id, tagIn);
 
-        public void Remove(Tag tagIn) =>
-            _tags.DeleteOne(tag => tag.Id == tagIn.Id);
+        public async Task Remove(Tag tagIn) =>
+            await _tags.DeleteOneAsync(tag => tag.Id == tagIn.Id);
 
-        public void Remove(string id) =>
-            _tags.DeleteOne(tag => tag.Id == id);
+        public async Task Remove(string id) =>
+            await _tags.DeleteOneAsync(tag => tag.Id == id);
 
-        public void Remove(IEnumerable<string> tags)
+        public async Task Remove(IEnumerable<string> tags)
         {
             foreach (var tagId in tags)
             {
-                var tag = _tags.Find(tag => tag.Id == tagId).FirstOrDefault();
+                var foundTag = await _tags.FindAsync(t => t.Id == tagId);
+                var tag = await foundTag.FirstOrDefaultAsync();
                 tag.Count--;
                 if (tag.Count <= 0)
                 {
-                    Remove(tagId);
+                    await Remove(tagId);
                 }
             }
         }
         
-        public bool NameExists(string name)
+        public async Task<bool> NameExists(string name)
         {
-            return _tags.Find(t => t.Name == name).FirstOrDefault() != null;
+            var foundTag = await _tags.FindAsync(t => t.Name == name);
+            return await foundTag.FirstOrDefaultAsync() != null;
         }
     }
 }
