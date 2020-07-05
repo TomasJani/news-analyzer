@@ -2,7 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <RootNamespace>api</RootNamespace>
+        <RootNamespace>Api</RootNamespace>
+        <OutputType>Exe</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
@@ -11,68 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Data\Data.csproj" />
+      <ProjectReference Include="..\Shared\Shared.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Content Update="Data\dennik_n\2020-06-27.json">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
-      <Content Update="Data\dennik_n\2020-06-26.json">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
-      <Content Update="Data\dennik_n\2020-06-21.json">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
-      <Content Update="Data\hlavne_spravy\2020-06-27.json">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
-      <Content Update="Data\hlavne_spravy\2020-06-26.json">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
-      <Content Update="Data\plus_7_dni\2020-06-27.json">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
-      <Content Update="Data\plus_7_dni\2020-06-26.json">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
-      <Content Update="Data\sme\2020-06-27.json">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
-      <Content Update="Data\sme\2020-06-26.json">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-      <_ContentIncludedByDefault Remove="RawArticles\dennik_n\2020-06-21.json" />
-      <_ContentIncludedByDefault Remove="RawArticles\dennik_n\2020-06-26.json" />
-      <_ContentIncludedByDefault Remove="RawArticles\dennik_n\2020-06-27.json" />
-      <_ContentIncludedByDefault Remove="RawArticles\hlavne_spravy\2020-06-26.json" />
-      <_ContentIncludedByDefault Remove="RawArticles\hlavne_spravy\2020-06-27.json" />
-      <_ContentIncludedByDefault Remove="RawArticles\plus_7_dni\2020-06-26.json" />
-      <_ContentIncludedByDefault Remove="RawArticles\plus_7_dni\2020-06-27.json" />
-      <_ContentIncludedByDefault Remove="RawArticles\sme\2020-06-26.json" />
-      <_ContentIncludedByDefault Remove="RawArticles\sme\2020-06-27.json" />
-    </ItemGroup>
-
 
 </Project>

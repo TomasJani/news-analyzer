@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 using Coravel.Invocable;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Shared.Models;
 
-namespace Data.DataService
+namespace Data
 {
     public class LoadDataInvocable : IInvocable
     {

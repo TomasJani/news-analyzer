@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Newtonsoft.Json;
-using Data.DataService.Enums;
+using Shared.Enums;
 
-namespace Data.DataService
+namespace Shared
 {
     public struct JsonConverters
     {

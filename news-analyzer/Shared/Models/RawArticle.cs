@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using Data.DataService;
-using Data.DataService.Enums;
 using Newtonsoft.Json;
+using Shared.Enums;
 
-namespace Data
+namespace Shared.Models
 {
     public class RawArticle
     {
@@ -14,7 +13,7 @@ namespace Data
         public string Author { get; set; }
         public string Photo { get; set; }
 
-        [System.Text.Json.Serialization.JsonConverter(typeof(JsonConverters.CategoryConverter))]
+        [JsonConverter(typeof(JsonConverters.CategoryConverter))]
         public Category Category { get; set; }
 
         public string Url { get; set; }

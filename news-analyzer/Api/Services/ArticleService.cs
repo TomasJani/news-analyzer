@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Api.Models;
-using Data;
 using MongoDB.Driver;
+using Shared.Models;
 
 namespace Api.Services
 {

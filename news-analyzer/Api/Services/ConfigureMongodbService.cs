@@ -1,10 +1,10 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Api.Models;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
-using Tag = Api.Models.Tag;
+using Shared.Models;
+using Tag = Shared.Models.Tag;
 
 namespace Api.Services
 {

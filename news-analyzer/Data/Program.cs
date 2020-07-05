@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using Coravel;
-using Data.DataService;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;

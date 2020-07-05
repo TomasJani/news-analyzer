@@ -1,4 +1,4 @@
-namespace Data.DataService.Enums
+namespace Shared.Enums
 {
     public enum Category
     {

@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Data.DataService.Enums;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Shared.Enums;
 
-namespace Api.Models
+namespace Shared.Models
 {
     public class Article
     {
@@ -20,7 +18,7 @@ namespace Api.Models
         public string Url { get; set; }
         public string Photo { get; set; }
         public Category Category { get; set; }
-        [DataType(DataType.Date)] public DateTime Published { get; set; }
+        public DateTime Published { get; set; }
 
         public string AuthorId { get; set; }
 

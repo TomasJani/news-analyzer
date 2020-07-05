@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
-using Api.Models;
 using Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Shared.Models;
 
 namespace Api.Controllers
 {
