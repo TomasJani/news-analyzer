@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Shared.Enums;
@@ -33,6 +34,16 @@ namespace Api.Services
             var authors = await _authors.FindAsync(Builders<Author>.Filter.Text(name));
             return await authors.ToListAsync();
         }
+        
+        public async Task<List<Article>> FilterByAuthor(List<Article> articles, string authorName)
+        {
+            if (string.IsNullOrEmpty(authorName)) 
+                return articles;
+            
+            var authorSearch = await Search(authorName);
+            var authors = authorSearch.Select(author => author.Id).ToList();
+            return articles.Where(article => authors.Contains(article.AuthorId)).ToList();
+        }
 
         public async Task<Author> Create(Author author)
         {
@@ -42,10 +53,8 @@ namespace Api.Services
 
         public async Task<Author> Create(string authorName, Site site, string articleId)
         {
-            if (string.IsNullOrEmpty(authorName))
-            {
+            if (string.IsNullOrEmpty(authorName)) 
                 return null;
-            }
 
             var findAuthor = await _authors.FindAsync(Builders<Author>.Filter.Text(authorName));
             var author = await findAuthor.FirstOrDefaultAsync();
@@ -76,10 +85,8 @@ namespace Api.Services
             var findAuthor = await _authors.FindAsync(a => a.Id == id);
             var author =  await findAuthor.FirstOrDefaultAsync();
             author.Count--;
-            if (author.Count <= 0)
-            {
+            if (author.Count <= 0) 
                 await _authors.DeleteOneAsync(a => a.Id == id);
-            }
         }
 
         public async Task<bool> NameExists(string name)

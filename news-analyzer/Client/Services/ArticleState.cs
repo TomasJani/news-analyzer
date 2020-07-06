@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Shared.Models;
@@ -27,23 +29,36 @@ namespace Client.Services
             NotifyStateChanged();
             
             var response = await _httpClient.GetAsync("https://localhost:5001/api/articles");
-            Articles = JsonConvert.DeserializeObject<Article[]>(await response.Content.ReadAsStringAsync());
+            if (response.IsSuccessStatusCode)
+            {
+                Articles = JsonConvert.DeserializeObject<Article[]>(await response.Content.ReadAsStringAsync());
+            }
+
             IsLoaded = true;
             NotifyStateChanged();
         }
         
-        // public async Task Search(SearchCriteria criteria)
-        // {
-        //     IsLoaded = false;
-        //     
-        //     Articles = await _httpClient.PostAsync("https://localhost:5001/api/articles/search", criteria);
-        //     IsLoaded = true;
-        // }
-        //
-        // public void AddToSavedSearches()
-        // {
-        //     
-        // }
+        public async Task Search(SearchQuery searchQuery)
+        {
+            IsLoaded = false;
+            NotifyStateChanged();
+
+            var jsonquery = JsonConvert.SerializeObject(searchQuery);
+            Console.WriteLine(jsonquery);
+
+            var response = await _httpClient.PostAsJsonAsync("https://localhost:5001/api/articles/search", searchQuery);
+            if (response.IsSuccessStatusCode)
+            {
+                Articles = JsonConvert.DeserializeObject<Article[]>(await response.Content.ReadAsStringAsync());
+            }
+            IsLoaded = true;
+            NotifyStateChanged();
+        }
+        
+        public void AddToSavedSearches()
+        {
+            
+        }
         
         private void NotifyStateChanged() => OnChange?.Invoke();
     }

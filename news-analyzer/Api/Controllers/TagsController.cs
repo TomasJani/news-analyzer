@@ -2,12 +2,14 @@ using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Api.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Shared.Models;
 
 namespace Api.Controllers
 {
+    [EnableCors]
     [ApiController]
     [Route("api/[controller]")]
     [Produces(MediaTypeNames.Application.Json)]
@@ -32,10 +34,8 @@ namespace Api.Controllers
             var tag = await _tagService.Get(id);
         
             if (tag == null)
-            {
                 return NotFound();
-            }
-        
+
             return tag;
         }
         
@@ -44,11 +44,6 @@ namespace Api.Controllers
         public async Task<ActionResult<List<Tag>>> Search([FromBody] string name)
         {
             var tags = await _tagService.Search(name);
-
-            if (tags.Count == 0)
-            {
-                return NotFound();
-            }
 
             return tags;
         }
@@ -72,9 +67,7 @@ namespace Api.Controllers
             var tag = await _tagService.Get(id);
 
             if (tag == null)
-            {
                 return NotFound();
-            }
 
             await _tagService.Update(id, tagIn);
 
@@ -87,9 +80,7 @@ namespace Api.Controllers
             var tag = await _tagService.Get(id);
 
             if (tag == null)
-            {
                 return NotFound();
-            }
 
             await _tagService.Remove(tag.Id);
 

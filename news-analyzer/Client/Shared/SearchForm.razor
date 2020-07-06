@@ -1,0 +1,57 @@
+﻿@using global::Shared.Models
+@using Client.Services
+@inject ArticleState ArticleState
+@using BlazorDateRangePicker
+@using System.Timers;
+
+<label>
+    Content:
+    <input placeholder="Content" @bind="_searchQuery.Text" @bind:event="oninput" />
+</label>
+
+<hr>
+
+<label>
+    Author:
+    <input placeholder="Author name" @bind="_searchQuery.AuthorName" @bind:event="oninput" />
+</label>
+
+<hr>
+
+<label>
+    Tag:
+    <input placeholder="Tag name" @bind="_searchQuery.TagName" @bind:event="oninput" />
+</label>
+
+<hr>
+
+<label>
+    HomeNews:
+    <input type="checkbox" @bind="_searchQuery.SearchHomeNews" @bind:event="oninput" />
+</label>
+
+<label>
+    Foreign News:
+    <input type="checkbox" @bind="_searchQuery.SearchForeignNews" @bind:event="oninput" />
+</label>
+
+<hr>
+
+<DateRangePicker @bind-StartDate="_searchQuery.StartDate" @bind-EndDate="_searchQuery.EndDate"/> 
+
+
+
+@code {
+    SearchQuery _searchQuery;
+
+    private async void Search(object source, ElapsedEventArgs e)
+    {
+        await ArticleState.Search(_searchQuery);
+    }
+
+    protected override void OnInitialized()
+    {
+        _searchQuery = new SearchQuery();
+        _searchQuery.DebounceTimer.Elapsed += Search;
+    }
+}

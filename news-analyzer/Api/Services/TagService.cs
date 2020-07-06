@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Shared.Models;
@@ -14,7 +15,6 @@ namespace Api.Services
         {
             var database = client.GetDatabase(settings.DatabaseName);
             _tags = database.GetCollection<Tag>(settings.TagCollectionName);
-
         }
 
         public async Task<List<Tag>> Get()
@@ -35,6 +35,16 @@ namespace Api.Services
             return await foundTag.ToListAsync();
         }
 
+        public async Task<List<Article>> FilterByTagName(List<Article> articles, string tagName)
+        {
+            if (string.IsNullOrEmpty(tagName)) 
+                return articles;
+
+            var tagSearch = await Search(tagName);
+            var tags = tagSearch.Select(tag => tag.Id).ToList();
+            return articles.Where(article => article.Tags.Intersect(tags).Count() != 0).ToList();
+        }
+
         public async Task<Tag> Create(Tag tag)
         {
             await _tags.InsertOneAsync(tag);
@@ -46,10 +56,8 @@ namespace Api.Services
             var tags = new List<string>();
             foreach (var tagName in tagNames)
             {
-                if (string.IsNullOrEmpty(tagName))
-                {
+                if (string.IsNullOrEmpty(tagName)) 
                     continue;
-                }
 
                 var foundTag = await _tags.FindAsync(Builders<Tag>.Filter.Text(tagName));
                 var tag = await foundTag.FirstOrDefaultAsync();
@@ -89,12 +97,10 @@ namespace Api.Services
                 var tag = await foundTag.FirstOrDefaultAsync();
                 tag.Count--;
                 if (tag.Count <= 0)
-                {
                     await Remove(tagId);
-                }
             }
         }
-        
+
         public async Task<bool> NameExists(string name)
         {
             var foundTag = await _tags.FindAsync(t => t.Name == name);

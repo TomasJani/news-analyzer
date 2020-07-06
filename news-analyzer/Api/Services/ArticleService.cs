@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using Shared.Enums;
 using Shared.Models;
 
 namespace Api.Services
@@ -32,11 +34,46 @@ namespace Api.Services
             return await foundArticle.FirstOrDefaultAsync();
         }
 
-        public async Task<List<Article>> Search(string text)
+        public async Task<List<Article>> Search(SearchQuery searchQuery)
         {
-            var foundArticle = await _articles.FindAsync(Builders<Article>.Filter.Text(text));
-            return await foundArticle.ToListAsync();
+            List<Article> articles;
+            if (string.IsNullOrEmpty(searchQuery.Text))
+                articles = await Get();
+            else
+            {
+                var foundArticle = await _articles.FindAsync(Builders<Article>.Filter.Text(searchQuery.Text));
+                articles = await foundArticle.ToListAsync();   
+            }
+
+            articles = FilterByCategories(articles, searchQuery);
+
+            articles = await _tagService.FilterByTagName(articles, searchQuery.TagName);
+            
+            articles = await _authorService.FilterByAuthor(articles, searchQuery.AuthorName);
+
+            articles = FilterByDate(articles, searchQuery.StartDate, searchQuery.EndDate);
+
+            return articles;
         }
+
+        private List<Article> FilterByDate(List<Article> articles, DateTimeOffset? startDate, DateTimeOffset? endDate)
+        {
+            if (startDate == null || endDate == null) 
+                return articles;
+            return articles.FindAll(article => article.Published > startDate && article.Published < endDate);
+        }
+
+        private List<Article> FilterByCategories(List<Article> articles, SearchQuery searchQuery)
+        {
+            if (searchQuery.SearchForeignNews && searchQuery.SearchHomeNews) 
+                return articles;
+            if (searchQuery.SearchForeignNews)
+                return articles.FindAll(article => article.Category == Category.ForeignNews);
+            return searchQuery.SearchHomeNews ? 
+                articles.FindAll(article => article.Category == Category.HomeNews) : 
+                new List<Article>();
+        }
+
 
         public async Task<Article> Create(Article article)
         {

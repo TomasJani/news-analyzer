@@ -2,12 +2,14 @@ using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Api.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Shared.Models;
 
 namespace Api.Controllers
 {
+    [EnableCors]
     [ApiController]
     [Route("api/[controller]")]
     [Produces(MediaTypeNames.Application.Json)]
@@ -32,46 +34,40 @@ namespace Api.Controllers
             var article = await _articleService.Get(id);
 
             if (article == null)
-            {
                 return NotFound();
-            }
 
             return article;
         }
 
         [HttpPost("search")]
         [Consumes("application/json")]
-        public async Task<ActionResult<List<Article>>> Search([FromBody] string text)
+        public async Task<ActionResult<List<Article>>> Search([FromBody] SearchQuery searchQuery)
         {
-            var articles = await _articleService.Search(text);
-
-            if (articles.Count == 0)
-            {
-                return NotFound();
-            }
+            var articles = await _articleService.Search(searchQuery);
 
             return articles;
         }
 
         [HttpPost]
+        [EnableCors]
         [Consumes("application/json")]
         public async Task<ActionResult<Article>> Create(Article article)
         {
             if (await _articleService.TitleExists(article.Title))
                 return Conflict();
-            
+
             await _articleService.Create(article);
 
             return CreatedAtRoute("GetArticle", new {id = article.Id}, article);
         }
-        
+
         [HttpPost("raw")]
         [Consumes("application/json")]
         public async Task<ActionResult<Article>> Create(RawArticle article)
         {
             if (await _articleService.TitleExists(article.Title))
                 return Conflict();
-            
+
             var newArticle = await _articleService.Create(article);
 
             return CreatedAtRoute("GetArticle", new {id = newArticle.Id}, newArticle);
@@ -84,9 +80,7 @@ namespace Api.Controllers
             var article = await _articleService.Get(id);
 
             if (article == null)
-            {
                 return NotFound();
-            }
 
             await _articleService.Update(id, articleIn);
 
@@ -98,10 +92,8 @@ namespace Api.Controllers
         {
             var article = await _articleService.Get(id);
 
-            if (article == null)
-            {
+            if (article == null) 
                 return NotFound();
-            }
 
             await _articleService.Remove(article.Id);
 

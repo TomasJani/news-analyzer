@@ -2,12 +2,14 @@ using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Api.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Shared.Models;
 
 namespace Api.Controllers
 {
+    [EnableCors]
     [ApiController]
     [Route("api/[controller]")]
     [Produces(MediaTypeNames.Application.Json)]
@@ -31,10 +33,8 @@ namespace Api.Controllers
         {
             var author = await _authorService.Get(id);
 
-            if (author == null)
-            {
+            if (author == null) 
                 return NotFound();
-            }
 
             return author;
         }
@@ -45,11 +45,6 @@ namespace Api.Controllers
         {
             var authors = await _authorService.Search(name);
 
-            if (authors.Count == 0)
-            {
-                return NotFound();
-            }
-
             return authors;
         }
 
@@ -57,7 +52,7 @@ namespace Api.Controllers
         [Consumes("application/json")]
         public async Task<ActionResult<Author>> Create(Author author)
         {
-            if (await _authorService.NameExists(author.Name))
+            if (await _authorService.NameExists(author.Name)) 
                 return Conflict();
             
             await _authorService.Create(author);
@@ -72,9 +67,7 @@ namespace Api.Controllers
             var author = await _authorService.Get(id);
 
             if (author == null)
-            {
                 return NotFound();
-            }
 
             await _authorService.Update(id, authorIn);
 
@@ -87,9 +80,8 @@ namespace Api.Controllers
             var author = await _authorService.Get(id);
 
             if (author == null)
-            {
                 return NotFound();
-            }
+            
 
             await _authorService.Remove(author.Id);
 

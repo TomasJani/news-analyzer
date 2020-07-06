@@ -43,7 +43,9 @@ namespace Api
                     builder =>
                     {
                         builder.WithOrigins("https://localhost:4001",
-                            "https://localhost:4000");
+                                "https://localhost:4000")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
                     });
             });
 
@@ -67,7 +69,11 @@ namespace Api
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints => { endpoints.MapControllers().RequireCors(MyAllowSpecificOrigins); });
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers()
+                    .RequireCors(MyAllowSpecificOrigins);
+            });
         }
     }
 }
