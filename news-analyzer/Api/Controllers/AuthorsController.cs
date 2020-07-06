@@ -5,7 +5,7 @@ using Api.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Shared.Models;
+using SharedModels.Models;
 
 namespace Api.Controllers
 {

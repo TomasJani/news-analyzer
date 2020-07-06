@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using Shared.Enums;
+using SharedModels.Enums;
 
-namespace Shared.Models
+namespace SharedModels.Models
 {
     public class RawArticle
     {

@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Shared.Enums;
+using SharedModels.Enums;
 
-namespace Shared.Models
+namespace SharedModels.Models
 {
     public class Article
     {

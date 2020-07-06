@@ -1,11 +1,14 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Timers;
 using Newtonsoft.Json;
 
-namespace Shared.Models
+namespace SharedModels.Models
 {
-    public class SearchQuery
+    public class SearchQuery : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+        
         [JsonIgnore]
         public Timer DebounceTimer = new Timer
         {
@@ -27,6 +30,7 @@ namespace Shared.Models
             set
             {
                 _text = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Text)));
                 DebounceTimer?.Stop();
                 DebounceTimer?.Start();
             }
@@ -38,8 +42,10 @@ namespace Shared.Models
             set
             {
                 _tagName = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TagName)));
                 DebounceTimer?.Stop();
                 DebounceTimer?.Start();
+                
             }
         }
 
@@ -49,8 +55,10 @@ namespace Shared.Models
             set
             {
                 _authorName = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AuthorName)));
                 DebounceTimer?.Stop();
                 DebounceTimer?.Start();
+                
             }
         }
 
@@ -60,8 +68,10 @@ namespace Shared.Models
             set
             {
                 _searchHomeNews = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SearchHomeNews)));
                 DebounceTimer?.Stop();
                 DebounceTimer?.Start();
+                
             }
         }
 
@@ -71,8 +81,10 @@ namespace Shared.Models
             set
             {
                 _searchForeignNews = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SearchForeignNews)));
                 DebounceTimer?.Stop();
                 DebounceTimer?.Start();
+                
             }
         }
 
@@ -82,8 +94,10 @@ namespace Shared.Models
             set
             {
                 _startDate = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StartDate)));
                 DebounceTimer?.Stop();
                 DebounceTimer?.Start();
+                
             }
         }
 
@@ -93,8 +107,10 @@ namespace Shared.Models
             set
             {
                 _endDate = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EndDate)));
                 DebounceTimer?.Stop();
                 DebounceTimer?.Start();
+                
             }
         }
     }

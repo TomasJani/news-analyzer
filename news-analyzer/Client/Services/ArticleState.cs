@@ -4,8 +4,9 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
+using Client.Pages;
 using Newtonsoft.Json;
-using Shared.Models;
+using SharedModels.Models;
 
 namespace Client.Services
 {

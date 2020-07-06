@@ -1,4 +1,4 @@
-namespace Shared.Models
+namespace SharedModels.Models
 {
     public class NewsStoreDatabaseSettings : INewsStoreDatabaseSettings
     {

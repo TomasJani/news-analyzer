@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
-using Shared.Models;
-using Tag = Shared.Models.Tag;
+using SharedModels.Models;
+using Tag = SharedModels.Models.Tag;
 
 namespace Api.Services
 {

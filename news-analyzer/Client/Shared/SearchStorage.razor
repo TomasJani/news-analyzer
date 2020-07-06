@@ -1,0 +1,68 @@
+﻿@using Newtonsoft.Json
+@using SharedModels.Models
+@inject IJSRuntime JsRuntime
+@inject SearchQuery SearchQuery
+
+@if (hasLoaded)
+{
+    @ChildContent
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    private bool hasLoaded;
+    private bool isDeserializing;
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        string searchQueryJson;
+        try
+        {
+            searchQueryJson = await JsRuntime.InvokeAsync<string>("stateManager.load", "_searchQuery");
+        }
+        catch(InvalidOperationException)
+        {
+            return;
+        }
+        if (searchQueryJson != null)
+        {
+            try
+            {
+                var searchQueryStorage = JsonConvert.DeserializeObject<SearchQuery>(searchQueryJson);
+                if (searchQueryStorage != null)
+                {
+                    isDeserializing = true;
+                    SearchQuery.Text = searchQueryStorage.Text;
+                    SearchQuery.AuthorName = searchQueryStorage.AuthorName;
+                    SearchQuery.TagName = searchQueryStorage.TagName;
+                    SearchQuery.SearchHomeNews = searchQueryStorage.SearchHomeNews;
+                    SearchQuery.SearchForeignNews = searchQueryStorage.SearchForeignNews;
+                    SearchQuery.StartDate = searchQueryStorage.StartDate;
+                    SearchQuery.EndDate = searchQueryStorage.EndDate;
+                    isDeserializing = false;
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
+        SearchQuery.PropertyChanged += async (o, e) =>
+        {
+            if (isDeserializing)
+            {
+                return;
+            }
+            var searchQueryJson = JsonConvert.SerializeObject(SearchQuery);
+            await JsRuntime.InvokeAsync<object>(
+                "stateManager.save", "_searchQuery", searchQueryJson);
+        };
+        hasLoaded = true;
+    }
+}

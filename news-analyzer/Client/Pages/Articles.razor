@@ -1,10 +1,16 @@
 ﻿@page "/articles"
 @using Client.Services
+@using SharedModels.Models
+@using Newtonsoft.Json
 @inject ArticleState ArticleState
+@inject IJSRuntime JsRuntime
+@inject SearchQuery SearchQuery
 
-<h1>Articles</h1>
+<SearchStorage>
+    <h1>Articles</h1>
 
-<SearchForm/>
+    <SearchForm SearchQuery="@SearchQuery"/>
+</SearchStorage>
 
 @if (!ArticleState.IsLoaded)
 {
@@ -14,17 +20,31 @@
 }
 else
 {
+    <button @onclick="@SaveToLocalStorage">Save</button>
+
     @foreach (var article in ArticleState.Articles)
     {
         <p>@article.Title</p>
     }
 }
 
+
 @code {
+    private SavedSearchQuery _savedSearchQuery = new SavedSearchQuery();
+
     protected override async Task OnInitializedAsync()
     {
         ArticleState.OnChange += StateHasChanged;
         await ArticleState.Load();
+    }
+
+    private async Task SaveToLocalStorage()
+    {
+        _savedSearchQuery.Articles = ArticleState.Articles;
+        _savedSearchQuery.SearchQuery = SearchQuery;
+        var savedJson = JsonConvert.SerializeObject(_savedSearchQuery);
+        await JsRuntime.InvokeAsync<object>(
+            "stateManager.save", SearchQuery.Text, savedJson);
     }
 
 }

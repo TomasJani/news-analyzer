@@ -1,4 +1,4 @@
-namespace Shared.Enums
+namespace SharedModels.Enums
 {
     public enum Site
     {

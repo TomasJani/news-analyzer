@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Coravel.Invocable;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Shared.Models;
+using SharedModels.Models;
 
 namespace Data
 {

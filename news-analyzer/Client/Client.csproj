@@ -14,13 +14,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Shared\Shared.csproj" />
+      <Content Update="Pages\SearchForm.razor">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      </Content>
     </ItemGroup>
 
     <ItemGroup>
-      <Content Update="Shared\SearchForm.razor">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      </Content>
+      <ProjectReference Include="..\SharedModels\SharedModels.csproj" />
     </ItemGroup>
 
 </Project>

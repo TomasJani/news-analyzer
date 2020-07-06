@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Shared.Enums;
-using Shared.Models;
+using SharedModels.Enums;
+using SharedModels.Models;
 
 namespace Api.Services
 {

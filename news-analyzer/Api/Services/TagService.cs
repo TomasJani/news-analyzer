@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Shared.Models;
-using Tag = Shared.Models.Tag;
+using SharedModels.Models;
+using Tag = SharedModels.Models.Tag;
 
 namespace Api.Services
 {
