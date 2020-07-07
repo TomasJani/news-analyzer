@@ -1,0 +1,51 @@
+﻿@page "/saved"
+@using SharedModels.Models
+@using Newtonsoft.Json
+@inject IJSRuntime JsRuntime
+
+<h1>Saved seaches: </h1>
+
+@if (SearchQueries.Count == 0)
+{
+    <a href="articles">Add anathor searches</a>
+}
+else
+{
+    @foreach (var searchQuery in SearchQueries)
+    {
+        <p>@searchQuery.SearchQuery.Text</p>
+        @foreach (var article in searchQuery.Articles)
+        {
+            <p>@article.Title</p>
+        }
+        <button @onclick="@(() => DeleteFromLocal(searchQuery))">Delete</button>
+    }
+}
+
+
+@code {
+    public List<SavedSearchQuery> SearchQueries { get; set; } = new List<SavedSearchQuery>();
+
+    private async Task LoadSavedSearches()
+    {
+        var searchListJson = await JsRuntime.InvokeAsync<string>("stateManager.load", "_searchQueriesList") ?? "";
+        SearchQueries = JsonConvert.DeserializeObject<List<SavedSearchQuery>>(searchListJson) ?? new List<SavedSearchQuery>();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSavedSearches();
+    }
+
+    private async Task DeleteFromLocal(SavedSearchQuery searchQuery)
+    {
+        SearchQueries.Remove(searchQuery);
+
+        var savedJson = JsonConvert.SerializeObject(SearchQueries);
+        await JsRuntime.InvokeAsync<object>(
+            "stateManager.save", "_searchQueriesList", savedJson);
+
+        await LoadSavedSearches();
+    }
+
+}

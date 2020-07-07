@@ -40,11 +40,17 @@ else
 
     private async Task SaveToLocalStorage()
     {
+        var searchListJson = await JsRuntime.InvokeAsync<string>("stateManager.load", "_searchQueriesList") ?? "";
+        var listStorage = JsonConvert.DeserializeObject<List<SavedSearchQuery>>(searchListJson) ?? new List<SavedSearchQuery>();
+
         _savedSearchQuery.Articles = ArticleState.Articles;
         _savedSearchQuery.SearchQuery = SearchQuery;
-        var savedJson = JsonConvert.SerializeObject(_savedSearchQuery);
+
+        listStorage.Add(_savedSearchQuery);
+
+        var savedJson = JsonConvert.SerializeObject(listStorage);
         await JsRuntime.InvokeAsync<object>(
-            "stateManager.save", SearchQuery.Text, savedJson);
+            "stateManager.save", "_searchQueriesList", savedJson);
     }
 
 }

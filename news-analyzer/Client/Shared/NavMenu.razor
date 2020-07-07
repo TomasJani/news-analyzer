@@ -8,36 +8,26 @@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <ul class="nav flex-column">
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
             <NavLink class="nav-link" href="articles">
                 <span class="oi oi-list-rich" aria-hidden="true"></span> Articles
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="saved">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Saved Searches
             </NavLink>
         </li>
     </ul>
 </div>
 
 @code {
-    private bool collapseNavMenu = true;
+    private bool _collapseNavMenu = true;
 
-    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private string NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
 
     private void ToggleNavMenu()
     {
-        collapseNavMenu = !collapseNavMenu;
+        _collapseNavMenu = !_collapseNavMenu;
     }
 
 }

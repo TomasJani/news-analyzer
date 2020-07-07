@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text;
 using System.Threading.Tasks;
-using Client.Pages;
 using Newtonsoft.Json;
 using SharedModels.Models;
 
@@ -28,7 +26,7 @@ namespace Client.Services
         {
             IsLoaded = false;
             NotifyStateChanged();
-            
+
             var response = await _httpClient.GetAsync("https://localhost:5001/api/articles");
             if (response.IsSuccessStatusCode)
             {
@@ -38,29 +36,22 @@ namespace Client.Services
             IsLoaded = true;
             NotifyStateChanged();
         }
-        
+
         public async Task Search(SearchQuery searchQuery)
         {
             IsLoaded = false;
             NotifyStateChanged();
-
-            var jsonquery = JsonConvert.SerializeObject(searchQuery);
-            Console.WriteLine(jsonquery);
 
             var response = await _httpClient.PostAsJsonAsync("https://localhost:5001/api/articles/search", searchQuery);
             if (response.IsSuccessStatusCode)
             {
                 Articles = JsonConvert.DeserializeObject<Article[]>(await response.Content.ReadAsStringAsync());
             }
+
             IsLoaded = true;
             NotifyStateChanged();
         }
-        
-        public void AddToSavedSearches()
-        {
-            
-        }
-        
+
         private void NotifyStateChanged() => OnChange?.Invoke();
     }
 }
