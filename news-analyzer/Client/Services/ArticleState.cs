@@ -11,7 +11,7 @@ namespace Client.Services
     public class ArticleState
     {
         public ICollection<Article> Articles { get; private set; } = new List<Article>();
-        public bool IsLoaded { get; private set; } = false;
+        public bool IsLoaded { get; private set; }
 
         private readonly HttpClient _httpClient;
 

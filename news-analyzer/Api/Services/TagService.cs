@@ -42,7 +42,7 @@ namespace Api.Services
 
             var tagSearch = await Search(tagName);
             var tags = tagSearch.Select(tag => tag.Id).ToList();
-            return articles.Where(article => article.Tags.Intersect(tags).Count() != 0).ToList();
+            return articles.Where(article => article.TagsIds.Intersect(tags).Count() != 0).ToList();
         }
 
         public async Task<Tag> Create(Tag tag)
@@ -105,6 +105,20 @@ namespace Api.Services
         {
             var foundTag = await _tags.FindAsync(t => t.Name == name);
             return await foundTag.FirstOrDefaultAsync() != null;
+        }
+        
+        public async Task<List<Article>> AddTags(List<Article> articles)
+        {
+            foreach (var article in articles)
+            {
+                article.Tags = new List<Tag>();
+                foreach (var tagsId in article.TagsIds)
+                {
+                    article.Tags.Add(await Get(tagsId));
+                }
+            }
+
+            return articles;
         }
     }
 }

@@ -22,7 +22,10 @@ namespace SharedModels.Models
 
         public string AuthorId { get; set; }
 
-        public ICollection<string> Tags { get; set; }
+        public ICollection<string> TagsIds { get; set; }
+
+        public virtual Author Author { get; set; }
+        public virtual ICollection<Tag> Tags { get; set; }
 
         public Article(string title, string description, string content, string url, string photo, Category category,
             DateTime published)

@@ -1,13 +1,14 @@
-﻿@page "/articles"
+﻿@page "/"
 @using Client.Services
 @using SharedModels.Models
 @using Newtonsoft.Json
+@using System.Globalization
 @inject ArticleState ArticleState
 @inject IJSRuntime JsRuntime
 @inject SearchQuery SearchQuery
 
 <SearchStorage>
-    <h1>Articles</h1>
+    <h1 class="mb-4 ml-2">Search</h1>
 
     <SearchForm SearchQuery="@SearchQuery"/>
 </SearchStorage>
@@ -20,29 +21,89 @@
 }
 else
 {
-    <button @onclick="@SaveToLocalStorage">Save</button>
+    <h2 class="ml-2 my-3">Save search</h2>
 
-    @foreach (var article in ArticleState.Articles)
+    <form class="form-row px-5 mb-3" onsubmit='return false'>
+        <div class="col-6">
+            <input class="form-control" placeholder="Search Query name" @bind="SearchQueryName" @bind:event="oninput" aria-describedby="inputGroupPrepend" required/>
+        </div>
+
+        <div class="col-6">
+            <button class="btn btn-primary align-content-center px-5" @onclick="@SaveToLocalStorage">Save</button>
+        </div>
+    </form>
+
+    @if (_showAlert)
     {
-        <p>@article.Title</p>
+        <div class="px-5">
+            <div class="alert alert-success fade show px-5" role="alert">
+                <strong>Succesfuly added.</strong> You can see your saved seaches at <a href="saved">saved</a> page.
+                <button class="close" type="button" @onclick="@(() => { _showAlert = false; })">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>   
     }
+
+    <h2 class="ml-2 my-3">Results</h2>
+
+    <hr>
+
+    <div class="px-5">
+        @foreach (var article in ArticleState.Articles)
+        {
+            <div class="card mb-3 w-100">
+                <div class="card-header">
+                    <h4>@article.Title</h4>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title overflow-hidden d-block">@article.Description</h5>
+                    <p class="card-text">@(new string(article.Content.Take(400).ToArray()))...</p>
+                    
+                    @foreach (var tag in article.Tags)
+                    {
+                        <span class="badge badge-primary">@tag.Name</span>
+                    }
+                    
+                </div>
+                <div class="card-footer text-muted">
+                    @article.Published.ToString(CultureInfo.CurrentCulture)
+                    @if (article.Author != null)
+                    {
+                        <span> - @article.Author.Name </span>
+                    }
+                </div>
+            </div>
+        }
+    </div>
 }
 
 
 @code {
     private SavedSearchQuery _savedSearchQuery = new SavedSearchQuery();
 
+    private bool _showAlert = false;
+
+    public string SearchQueryName { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
+        if (await JsRuntime.InvokeAsync<string>("stateManager.load", "_searchQueries") == null)
+        {
+            await ArticleState.Load();
+        }
         ArticleState.OnChange += StateHasChanged;
-        await ArticleState.Load();
     }
 
     private async Task SaveToLocalStorage()
     {
+        if (string.IsNullOrEmpty(SearchQueryName))
+            return;
+
         var searchListJson = await JsRuntime.InvokeAsync<string>("stateManager.load", "_searchQueriesList") ?? "";
         var listStorage = JsonConvert.DeserializeObject<List<SavedSearchQuery>>(searchListJson) ?? new List<SavedSearchQuery>();
 
+        _savedSearchQuery.Name = SearchQueryName;
         _savedSearchQuery.Articles = ArticleState.Articles;
         _savedSearchQuery.SearchQuery = SearchQuery;
 
@@ -51,6 +112,6 @@ else
         var savedJson = JsonConvert.SerializeObject(listStorage);
         await JsRuntime.InvokeAsync<object>(
             "stateManager.save", "_searchQueriesList", savedJson);
+        _showAlert = true;
     }
-
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -93,6 +94,16 @@ namespace Api.Services
         {
             var findAuthor = await _authors.FindAsync(a => a.Name == name);
             return await findAuthor.FirstOrDefaultAsync() != null;
+        }
+
+        public async Task<List<Article>> AddAuthors(List<Article> articles)
+        {
+            foreach (var article in articles.Where(article => !string.IsNullOrEmpty(article.AuthorId)))
+            {
+                article.Author = await Get(article.AuthorId);
+            }
+
+            return articles;
         }
     }
 }

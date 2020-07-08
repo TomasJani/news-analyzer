@@ -24,8 +24,14 @@ namespace Api.Services
 
         public async Task<List<Article>> Get()
         {
-            var foundArticle = await _articles.FindAsync(article => true);
-            return await foundArticle.ToListAsync();
+            var foundArticles = await _articles.FindAsync(article => true);
+            var articles = await foundArticles.ToListAsync();
+            
+            articles = await _authorService.AddAuthors(articles);
+            
+            articles = await _tagService.AddTags(articles);
+            
+            return articles;
         }
 
         public async Task<Article> Get(string id)
@@ -52,6 +58,10 @@ namespace Api.Services
             articles = await _authorService.FilterByAuthor(articles, searchQuery.AuthorName);
 
             articles = FilterByDate(articles, searchQuery.StartDate, searchQuery.EndDate);
+
+            articles = await _authorService.AddAuthors(articles);
+
+            articles = await _tagService.AddTags(articles);
 
             return articles;
         }
@@ -99,7 +109,7 @@ namespace Api.Services
             var tags = await _tagService.Create(tagNames, article.Id);
             var author = await _authorService.Create(authorName, site, article.Id);
 
-            article.Tags = tags;
+            article.TagsIds = tags;
             article.AuthorId = author?.Id;
             
             await Update(article.Id, article);
@@ -126,7 +136,7 @@ namespace Api.Services
 
         public async Task SafeRemove(Article article)
         {
-            await _tagService.Remove(article.Tags);
+            await _tagService.Remove(article.TagsIds);
             await _authorService.Remove(article.AuthorId);
         }
 

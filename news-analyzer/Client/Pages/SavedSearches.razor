@@ -1,30 +1,64 @@
 ﻿@page "/saved"
 @using SharedModels.Models
 @using Newtonsoft.Json
+@using System.Globalization
 @inject IJSRuntime JsRuntime
 
-<h1>Saved seaches: </h1>
+<h1>Saved seaches</h1>
 
 @if (SearchQueries.Count == 0)
 {
-    <a href="articles">Add anathor searches</a>
+    <a href="">Add anathor searches</a>
 }
 else
 {
-    @foreach (var searchQuery in SearchQueries)
-    {
-        <p>@searchQuery.SearchQuery.Text</p>
-        @foreach (var article in searchQuery.Articles)
-        {
-            <p>@article.Title</p>
-        }
-        <button @onclick="@(() => DeleteFromLocal(searchQuery))">Delete</button>
-    }
-}
+    <div id="accordion">
 
+        @foreach (var searchQuery in SearchQueries)
+        {
+            Index++;
+            AccordionClass = $"collapse{Index}";
+            <div class="card">
+                <div class="card-header col-12" id="headingOne">
+                    <h5 class="mb-0 d-inline">
+                        <button class="btn btn-link" data-toggle="collapse" data-target="#@AccordionClass" aria-expanded="true" aria-controls="@AccordionClass">
+                            @searchQuery.Name
+                        </button>
+                    </h5>
+
+                    <button class="btn btn-sm btn-danger d-inline float-right" @onclick="@(() => DeleteFromLocal(searchQuery))">Delete</button>
+                </div>
+
+                <div id="@AccordionClass" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                    <div class="px-5">
+                        @foreach (var article in searchQuery.Articles)
+                        {
+                            <div class="card mb-3 w-100">
+                                <div class="card-header">
+                                    <h4>@article.Title</h4>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title overflow-hidden d-block">@article.Description</h5>
+                                    <p class="card-text">@(new string(article.Content.Take(400).ToArray()))...</p>
+                                </div>
+                                <div class="card-footer text-muted">
+                                    @article.Published.ToString(CultureInfo.CurrentCulture) - @article.AuthorId
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
 
 @code {
     public List<SavedSearchQuery> SearchQueries { get; set; } = new List<SavedSearchQuery>();
+    
+    private int Index { get; set; }
+
+    public string AccordionClass { get; set; }
 
     private async Task LoadSavedSearches()
     {
