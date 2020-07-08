@@ -8,10 +8,8 @@
     <ItemGroup>
         <PackageReference Include="BlazorDateRangePicker" Version="2.7.0" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="3.2.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Build" Version="3.2.0"
-                          PrivateAssets="all" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="3.2.0"
-                          PrivateAssets="all" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Build" Version="3.2.0" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="3.2.0" PrivateAssets="all" />
         <PackageReference Include="System.Net.Http.Json" Version="3.2.0" />
     </ItemGroup>
 
@@ -22,6 +20,15 @@
     <ItemGroup>
         <Content Update="Shared\SearchForm.razor">
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        </Content>
+        <Content Update="Shared\SuccessAlert.razor">
+          <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        </Content>
+        <Content Update="Shared\ArticlesResult.razor">
+          <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        </Content>
+        <Content Update="Shared\SaveSearchesForm.razor">
+          <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </Content>
     </ItemGroup>
 

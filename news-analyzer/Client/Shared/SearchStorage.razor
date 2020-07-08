@@ -3,14 +3,8 @@
 @inject IJSRuntime JsRuntime
 @inject SearchQuery SearchQuery
 
-@if (_hasLoaded)
-{
-    @ChildContent
-}
-else
-{
-    <p>Loading...</p>
-}
+
+@ChildContent
 
 @code {
     private bool _hasLoaded;
@@ -28,6 +22,9 @@ else
             var searchQueryStorage = JsonConvert.DeserializeObject<SearchQuery>(searchQueryJson);
             if (searchQueryStorage != null)
             {
+                if (SearchQuery == searchQueryStorage)
+                    return;
+                
                 _isDeserializing = true;
                 SearchQuery.Text = searchQueryStorage.Text;
                 SearchQuery.AuthorName = searchQueryStorage.AuthorName;

@@ -1,0 +1,42 @@
+﻿@using Client.Services
+@using SharedModels.Models
+@using System.Globalization
+@inject ArticleState ArticleState
+@inject SearchQuery SearchQuery
+@inject IJSRuntime JsRuntime
+
+<h2 class="ml-2 my-3">Results</h2>
+
+<hr>
+
+<div class="px-5">
+    @foreach (var article in ArticleState.Articles)
+    {
+        <div class="card mb-3 w-100">
+            <div class="card-header">
+                <h4>@article.Title</h4>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title overflow-hidden d-block">@article.Description</h5>
+                <p class="card-text">@(new string(article.Content.Take(400).ToArray()))...</p>
+
+                @foreach (var tag in article.Tags)
+                {
+                    <button class="btn btn-sm btn-primary" @onclick="@(() => { SearchQuery.TagName = tag.Name; })">
+                        @tag.Name
+                    </button>
+                }
+
+            </div>
+            <div class="card-footer text-muted">
+                @article.Published.ToString(CultureInfo.CurrentCulture)
+                @if (article.Author != null)
+                {
+                    <button class="btn btn-sm btn-outline-info float-right" @onclick="@(() => { SearchQuery.AuthorName = article.Author.Name; })">
+                        @article.Author.Name
+                    </button>
+                }
+            </div>
+        </div>
+    }
+</div>

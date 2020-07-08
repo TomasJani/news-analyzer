@@ -1,0 +1,48 @@
+﻿@using SharedModels.Models
+@using Newtonsoft.Json
+@using Client.Services
+@inject IJSRuntime JsRuntime
+@inject ArticleState ArticleState
+@inject SearchQuery SearchQuery
+
+<h2 class="ml-2 my-3">Save search</h2>
+
+<form class="form-row px-5 mb-3" onsubmit="return false">
+    <div class="col-6">
+        <input class="form-control" placeholder="Search Query name" @bind="SearchQueryName" @bind:event="oninput" aria-describedby="inputGroupPrepend" required/>
+    </div>
+
+    <div class="col-6">
+        <button class="btn btn-primary align-content-center px-5" @onclick="@SaveToLocalStorage">Save</button>
+    </div>
+</form>
+
+<SuccessAlert ShowAlert="@_showAlert"/>
+
+@code {
+    private SavedSearchQuery _savedSearchQuery = new SavedSearchQuery();
+    
+    public string SearchQueryName { get; set; }
+    
+    private bool _showAlert;
+    
+    private async Task SaveToLocalStorage()
+    {
+        if (string.IsNullOrEmpty(SearchQueryName))
+            return;
+
+        var searchListJson = await JsRuntime.InvokeAsync<string>("stateManager.load", "_searchQueriesList") ?? "";
+        var listStorage = JsonConvert.DeserializeObject<List<SavedSearchQuery>>(searchListJson) ?? new List<SavedSearchQuery>();
+
+        _savedSearchQuery.Name = SearchQueryName;
+        _savedSearchQuery.Articles = ArticleState.Articles;
+        _savedSearchQuery.SearchQuery = SearchQuery;
+
+        listStorage.Add(_savedSearchQuery);
+
+        var savedJson = JsonConvert.SerializeObject(listStorage);
+        await JsRuntime.InvokeAsync<object>(
+            "stateManager.save", "_searchQueriesList", savedJson);
+        _showAlert = true;
+    }
+}

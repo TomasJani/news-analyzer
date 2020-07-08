@@ -13,6 +13,8 @@ namespace Client.Services
         public ICollection<Article> Articles { get; private set; } = new List<Article>();
         public bool IsLoaded { get; private set; }
 
+        public SearchQuery SearchQuery { get; set; }
+
         private readonly HttpClient _httpClient;
 
         public ArticleState(HttpClient httpClient)
