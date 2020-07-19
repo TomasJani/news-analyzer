@@ -71,9 +71,9 @@ namespace Data
                 using var jsonFileReader = File.OpenText(fileName);
                 return JsonConvert.DeserializeObject<RawArticle[]>(await jsonFileReader.ReadToEndAsync());
             }
-            catch (Exception e) 
+            catch (Exception) 
             {
-                _logger.Log(LogLevel.Error, $"Error in reading OR deserializing file {fileName}/n{e}");
+                _logger.Log(LogLevel.Warning, $"Error in reading OR deserializing file {fileName}");
             }
 
             return null;

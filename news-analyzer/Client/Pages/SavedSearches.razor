@@ -35,27 +35,27 @@ else
 
                     <table class="table table-striped">
                         <tbody>
-                            <tr>
-                                <th scope="row">Content</th>
-                                <td>@searchQuery.SearchQuery.Text</td>
-                                <th>Home news</th>
-                                <td>@searchQuery.SearchQuery.SearchHomeNews</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Tag name</th>
-                                <td>@searchQuery.SearchQuery.TagName</td>
-                                <th>Foreign news</th>
-                                <td>@searchQuery.SearchQuery.SearchForeignNews</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Author Name</th>
-                                <td>@searchQuery.SearchQuery.AuthorName</td>
-                                <th>Star/End date</th>
-                                <td>
-                                    @searchQuery.SearchQuery.StartDate.GetValueOrDefault().ToString("dd/MM/yy") - 
-                                    @searchQuery.SearchQuery.EndDate.GetValueOrDefault().ToString("dd/MM/yy")
-                                </td>
-                            </tr>
+                        <tr>
+                            <th scope="row">Content</th>
+                            <td>@searchQuery.SearchQuery.Text</td>
+                            <th>Home news</th>
+                            <td>@searchQuery.SearchQuery.SearchHomeNews</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Tag name</th>
+                            <td>@searchQuery.SearchQuery.TagName</td>
+                            <th>Foreign news</th>
+                            <td>@searchQuery.SearchQuery.SearchForeignNews</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Author Name</th>
+                            <td>@searchQuery.SearchQuery.AuthorName</td>
+                            <th>Star/End date</th>
+                            <td>
+                                @searchQuery.SearchQuery.StartDate.GetValueOrDefault().ToString("dd/MM/yyyy") -
+                                @searchQuery.SearchQuery.EndDate.GetValueOrDefault().ToString("dd/MM/yyyy")
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
 
@@ -69,9 +69,23 @@ else
                                 <div class="card-body">
                                     <h5 class="card-title overflow-hidden d-block">@article.Description</h5>
                                     <p class="card-text">@(new string(article.Content.Take(400).ToArray()))...</p>
+
+                                    @foreach (var tag in article.Tags)
+                                    {
+                                        <span class="btn btn-sm btn-primary">
+                                            @tag.Name
+                                        </span>
+                                    }
                                 </div>
+
                                 <div class="card-footer text-muted">
-                                    @article.Published.ToString(CultureInfo.CurrentCulture) - @article.AuthorId
+                                    @article.Published.ToString(CultureInfo.CurrentCulture)
+                                    @if (article.Author != null)
+                                    {
+                                        <span class="btn btn-sm btn-outline-info float-right">
+                                            @article.Author.Name
+                                        </span>
+                                    }
                                 </div>
                             </div>
                         }
