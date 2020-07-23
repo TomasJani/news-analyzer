@@ -30,6 +30,11 @@
         <Content Update="Shared\SaveSearchesForm.razor">
           <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </Content>
+        <Content Update="wwwroot\appsettings.json">
+          <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+          <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
     </ItemGroup>
 
 </Project>

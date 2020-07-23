@@ -1,51 +1,21 @@
-﻿@using Newtonsoft.Json
-@using SharedModels.Models
+﻿@using Client.Services
 @inject IJSRuntime JsRuntime
-@inject SearchQuery SearchQuery
+@inject StorageState StorageState
 
-
-@ChildContent
+@if (_hasLoaded)
+{
+    @ChildContent
+}
 
 @code {
     private bool _hasLoaded;
-    private bool _isDeserializing;
 
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        var searchQueryJson = await JsRuntime.InvokeAsync<string>("stateManager.load", "_searchQuery");
-
-        if (searchQueryJson != null)
-        {
-            var searchQueryStorage = JsonConvert.DeserializeObject<SearchQuery>(searchQueryJson);
-            if (searchQueryStorage != null)
-            {
-                if (SearchQuery == searchQueryStorage)
-                    return;
-                
-                _isDeserializing = true;
-                SearchQuery.Text = searchQueryStorage.Text;
-                SearchQuery.AuthorName = searchQueryStorage.AuthorName;
-                SearchQuery.TagName = searchQueryStorage.TagName;
-                SearchQuery.SearchHomeNews = searchQueryStorage.SearchHomeNews;
-                SearchQuery.SearchForeignNews = searchQueryStorage.SearchForeignNews;
-                SearchQuery.StartDate = searchQueryStorage.StartDate;
-                SearchQuery.EndDate = searchQueryStorage.EndDate;
-                _isDeserializing = false;
-            }
-        }
-        SearchQuery.PropertyChanged += async (o, e) =>
-        {
-            if (_isDeserializing)
-            {
-                return;
-            }
-            var searchQuerySave = JsonConvert.SerializeObject(SearchQuery);
-            await JsRuntime.InvokeAsync<object>(
-                "stateManager.save", "_searchQuery", searchQuerySave);
-        };
+        await StorageState.Initialize();
         _hasLoaded = true;
     }
 

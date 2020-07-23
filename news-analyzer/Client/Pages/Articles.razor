@@ -1,12 +1,10 @@
 ﻿@page "/"
 @using Client.Services
-@using SharedModels.Models
 @inject ArticleState ArticleState
 @inject IJSRuntime JsRuntime
-@inject SearchQuery SearchQuery
 
 <SearchStorage>
-    <SearchForm SearchQuery="@SearchQuery"/>
+    <SearchForm/>
 </SearchStorage>
 
 @if (!ArticleState.IsLoaded)

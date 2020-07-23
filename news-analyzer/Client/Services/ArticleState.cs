@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using SharedModels.Models;
 
@@ -13,13 +14,14 @@ namespace Client.Services
         public ICollection<Article> Articles { get; private set; } = new List<Article>();
         public bool IsLoaded { get; private set; }
 
-        public SearchQuery SearchQuery { get; set; }
-
         private readonly HttpClient _httpClient;
 
-        public ArticleState(HttpClient httpClient)
+        private readonly string _serverUrl;
+
+        public ArticleState(HttpClient httpClient, IConfiguration configuration)
         {
             _httpClient = httpClient;
+            _serverUrl = configuration["ApiUrl"];
         }
 
         public event Action OnChange;
@@ -29,7 +31,7 @@ namespace Client.Services
             IsLoaded = false;
             NotifyStateChanged();
 
-            var response = await _httpClient.GetAsync("https://localhost:5001/api/articles");
+            var response = await _httpClient.GetAsync($"{_serverUrl}articles");
             if (response.IsSuccessStatusCode)
             {
                 Articles = JsonConvert.DeserializeObject<Article[]>(await response.Content.ReadAsStringAsync());
@@ -44,7 +46,7 @@ namespace Client.Services
             IsLoaded = false;
             NotifyStateChanged();
 
-            var response = await _httpClient.PostAsJsonAsync("https://localhost:5001/api/articles/search", searchQuery);
+            var response = await _httpClient.PostAsJsonAsync($"{_serverUrl}articles/search", searchQuery);
             if (response.IsSuccessStatusCode)
             {
                 Articles = JsonConvert.DeserializeObject<Article[]>(await response.Content.ReadAsStringAsync());
